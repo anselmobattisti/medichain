@@ -1,0 +1,15 @@
+1 - Instalar o multichain
+
+2 - Criar a blockchain
+
+3 - no modo local quando iniciar a blockchain
+.\multichaind.exe chain1 -rpcuser=foo -rpcpassword=bar
+
+No postman para recuparar itens do stream1
+4 - {"method":"liststreamitems", "params":["stream1"], "chain_name":"chain1"}
+
+{"method":"liststreamitems", "params":["stream1"], "chain_name":"chain1"}
+
+{"method":"liststreamkeyitems", "params":["stream1","ba1208f2e2055b92b1c1799c958763f9"], "chain_name":"chain1"}
+
+
