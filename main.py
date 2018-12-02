@@ -1,7 +1,15 @@
+import time
 import hashlib
-import binascii
-import json
 from Savoir import Savoir
+from threading import Thread
+
+rpcuser = 'foo'
+rpcpasswd = 'bar'
+rpchost = 'localhost'
+rpcport = '7410'
+chainname = 'chain1'
+
+api = Savoir(rpcuser, rpcpasswd, rpchost, rpcport, chainname)
 
 def md5sum(filename, blocksize=65536):
     hash = hashlib.md5()
@@ -10,32 +18,60 @@ def md5sum(filename, blocksize=65536):
             hash.update(block)
     return hash.hexdigest()
 
-rpcuser = 'foo'
-rpcpasswd = 'bar'
-rpchost = 'localhost' #probably you don't need to connect to the server
-rpcport = '7410'
-chainname = 'chain1'
 
-api = Savoir(rpcuser, rpcpasswd, rpchost, rpcport, chainname)
+def insertFile(f):
+  # Insere o hash da mídia na blockchain
+  dados = api.publish('stream1',md5sum(f),'')
+  return dados
 
-# generate the hash from a file
-file_hash = md5sum('sample.png')
+def consultFile():
+    # Consulta o hash da mídia na blockchain
+  dados = api.liststreamkeyitems('stream1',md5sum('sample.png'))
+  return dados
 
-data = {
-    "president": {
-        "name": "Zaphod Beeblebrox",
-        "species": "Betelgeusian"
-    }
-}
+def insertTest():
+  a = []
+  d = []
+  for i in range(0,n):
+    a.append(time.time())
+    insertFile('img/'+str(i)+'.png')
+    d.append(time.time())
 
-j = json.loads(data)
-a = api.publish('stream1',file_hash, binascii.hexlify(bytes(j, "utf-8")))
+  linha = ""
+  for i in range(0,n):
+    linha = linha + str(i) + ";"+str(d[i]-a[i]) + "\n"
 
-print(a)
-print("a")
+  f_csv = open('insert_'+str(n)+".csv", "w")
+  f_csv.write(linha)
+  f_csv.close()
 
-# print(file_hash)
+def consultTest(ID):
+  a = []
+  d = []
+  for i in range(0,n):
+    a.append(time.time())
+    consultFile()
+    d.append(time.time())
 
+  linha = ""
+  for i in range(0,n):
+    linha = linha + str(i) + ";"+str(d[i]-a[i]) + "\n"
+
+  f_csv = open('consult_'+str(n)+"-"+str(ID)+".csv", "w")
+  f_csv.write(linha)
+  f_csv.close()
+
+n = 100
+# insertTest()
+c = []
+for i in range(0,10):
+  Thread(target=consultTest,args=[i]).start()
+
+# consultTest()
+print('fim')
+
+"""
+REPOSITÓRIO DE EXEMPLOS
 # data_to_store = binascii.hexlify(b'hello')
 # print(data_to_store)
 
@@ -48,5 +84,4 @@ print("a")
 # print(api.liststreamitems('stream1'))
 
 # print(api.getinfo())
-
-
+"""
